@@ -50,7 +50,6 @@ namespace AppCore.Services
             _specialOfferService.ApplySpecialOffersToBasketItemPrices(_basketItems);
 
             return _basketItems.Sum(i => i.Price);
-
         }
 
         public IList<BasketItem> GetBasketItems()

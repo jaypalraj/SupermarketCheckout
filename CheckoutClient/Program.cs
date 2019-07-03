@@ -13,6 +13,24 @@ namespace CheckoutClient
 {
     internal class Program
     {
+        private static void DisplayShelfItems(ShelfItem[] shelfItems, SpecialOffer[] specialOffers)
+        {
+            WriteLine("\n\t ITEMS ON DISPLAY SHELF...\n");
+            Write("\t =============================================== \n\n");
+            foreach (var item in shelfItems)
+            {
+                var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == item.Id);
+
+                var shelfItemDisplay = $"\t{item.Id} - {item.Name} ------------------ {item.Price:C2}";
+
+                if (specialOffer != null)
+                    shelfItemDisplay = shelfItemDisplay + $" ({specialOffer.Quantity} for {specialOffer.Price:C2})";
+
+                WriteLine(shelfItemDisplay);
+            }
+            Write("\n\t =============================================== \n\n");
+        }
+
         private static void BasketHandler(ShelfItem[] shelfItems, IBasketService basketService)
         {
             while (true)
@@ -47,6 +65,30 @@ namespace CheckoutClient
             }
         }
 
+        private static void PrintCustomerReceipt(SpecialOffer[] specialOffers, IBasketService basketService)
+        {
+            var totalBill = basketService.CalculateBasketTotal();
+
+
+            Write("\n\n\n");
+            WriteLine("\t CUSTOMER RECEIPT");
+            Write("\t ==============================================");
+
+            foreach (var basketItem in basketService.GetBasketItems())
+            {
+                var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == basketItem.ShelfItem.Id);
+                var receiptItemDisplay = $"\n\t {basketItem.ShelfItem.Name} - {basketItem.ShelfItem.Price:C2} * {basketItem.Quantity} => {basketItem.Price:C2}";
+                if (specialOffer != null)
+                    receiptItemDisplay = receiptItemDisplay + $" ({specialOffer.Quantity} for {specialOffer.Price:C2})";
+                WriteLine(receiptItemDisplay);
+            }
+
+            Write("\t ==============================================");
+            WriteLine($"\n\t YOUR TOTAL BILL IS: {totalBill:C2}");
+            Write("\t ==============================================");
+        }
+
+
 
         private static void Main()
         {
@@ -59,45 +101,14 @@ namespace CheckoutClient
                 var specialOffers = specialOfferRepository.GetActiveSpecialOffers().ToArray();
 
 
-                WriteLine("\n\t ITEMS ON DISPLAY SHELF...\n");
-                Write("\t =============================================== \n\n");
-                foreach (var item in shelfItems)
-                {
-                    var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == item.Id);
-
-                    var shelfItemDisplay = $"\t{item.Id} - {item.Name} ------------------ {item.Price:C2}";
-
-                    if (specialOffer != null)
-                        shelfItemDisplay = shelfItemDisplay + $" ({specialOffer.Quantity} for {specialOffer.Price:C2})";
-
-                    WriteLine(shelfItemDisplay);
-                }
-                Write("\n\t =============================================== \n\n");
+                DisplayShelfItems(shelfItems, specialOffers);
 
 
                 using (var basketService = new BasketService(new SpecialOfferService(specialOfferRepository)))
                 {
                     BasketHandler(shelfItems, basketService);
-                    var total = basketService.CalculateBasketTotal();
 
-
-
-                    Write("\n\n\n");
-                    WriteLine("\t CUSTOMER RECEIPT");
-                    Write("\t ==============================================");
-
-                    foreach (var basketItem in basketService.GetBasketItems())
-                    {
-                        var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == basketItem.ShelfItem.Id);
-                        var receiptItemDisplay = $"\n\t {basketItem.ShelfItem.Name} - {basketItem.ShelfItem.Price:C2} * {basketItem.Quantity} => {basketItem.Price:C2}";
-                        if(specialOffer != null)
-                            receiptItemDisplay = receiptItemDisplay + $" ({specialOffer.Quantity} for {specialOffer.Price:C2})";
-                        WriteLine(receiptItemDisplay);
-                    }
-
-                    Write("\t ==============================================");
-                    WriteLine($"\n\t YOUR TOTAL BILL IS: {total:C2}");
-                    Write("\t ==============================================");
+                    PrintCustomerReceipt(specialOffers, basketService);
                 }
 
                 ReadLine();
