@@ -27,7 +27,8 @@ namespace CheckoutClient
                 DisplayShelfItems(shelfItems, specialOffers);
 
 
-                using (var basketService = new BasketService(new SpecialOfferService(specialOfferRepository)))
+                ISpecialOfferService specialOfferService = new SpecialOfferService(specialOfferRepository);
+                using (var basketService = new BasketService(specialOfferService))
                 {
                     BasketHandler(shelfItems, basketService);
 
