@@ -54,7 +54,15 @@ namespace CheckoutClient
 
 
 
-        
+        private static Tuple<Discount, SpecialOffer> GetApplicableDiscountAndSpecialOfferOnShelfItem(int shelfItemId,
+            Discount[] discounts, SpecialOffer[] specialOffers)
+        {
+            var discount = discounts.SingleOrDefault(d => d.ShelfItemId == shelfItemId);
+
+            var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == shelfItemId);
+
+            return new Tuple<Discount, SpecialOffer>(discount, specialOffer);
+        }
 
         private static void DisplayShelfItems(ShelfItem[] shelfItems, Discount[] discounts, SpecialOffer[] specialOffers)
         {
@@ -62,9 +70,9 @@ namespace CheckoutClient
             Write("\t =============================================== \n\n");
             foreach (var item in shelfItems)
             {
-                var discount = discounts.SingleOrDefault(d => d.ShelfItemId == item.Id);
-
-                var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == item.Id);
+                var discountAndSpecialOffer = GetApplicableDiscountAndSpecialOfferOnShelfItem(item.Id, discounts, specialOffers);
+                var discount = discountAndSpecialOffer.Item1;
+                var specialOffer = discountAndSpecialOffer.Item2;
 
                 var shelfItemDisplay = $"\t{item.Id} - {item.Name} ------------------ {item.Price:C2}";
 
@@ -125,9 +133,9 @@ namespace CheckoutClient
 
             foreach (var basketItem in basketService.GetBasketItems())
             {
-                var discount = discounts.SingleOrDefault(d => d.ShelfItemId == basketItem.ShelfItem.Id);
-
-                var specialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == basketItem.ShelfItem.Id);
+                var discountAndSpecialOffer = GetApplicableDiscountAndSpecialOfferOnShelfItem(basketItem.ShelfItem.Id, discounts, specialOffers);
+                var discount = discountAndSpecialOffer.Item1;
+                var specialOffer = discountAndSpecialOffer.Item2;
 
                 var receiptItemDisplay = $"\n\t {basketItem.ShelfItem.Name} - {basketItem.ShelfItem.Price:C2} ";
 
