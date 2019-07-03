@@ -13,6 +13,44 @@ namespace CheckoutClient
 {
     internal class Program
     {
+        private static void Main()
+        {
+            try
+            {
+                var shelfItemRepository = new ShelfItemRepository();
+                var shelfItems = shelfItemRepository.GetShelfItems().ToArray();
+
+                var specialOfferRepository = new SpecialOfferRepository();
+                var specialOffers = specialOfferRepository.GetActiveSpecialOffers().ToArray();
+
+
+                DisplayShelfItems(shelfItems, specialOffers);
+
+
+                using (var basketService = new BasketService(new SpecialOfferService(specialOfferRepository)))
+                {
+                    BasketHandler(shelfItems, basketService);
+
+                    PrintCustomerReceipt(specialOffers, basketService);
+                }
+
+                ReadLine();
+            }
+            catch (Exception ex)
+            {
+                WriteLine("\n\n");
+
+                ILogger logger = new ConsoleLogger();
+                logger.LogException(ex);
+
+                ReadLine();
+            }
+        }
+
+
+
+
+
         private static void DisplayShelfItems(ShelfItem[] shelfItems, SpecialOffer[] specialOffers)
         {
             WriteLine("\n\t ITEMS ON DISPLAY SHELF...\n");
@@ -86,42 +124,6 @@ namespace CheckoutClient
             Write("\t ==============================================");
             WriteLine($"\n\t YOUR TOTAL BILL IS: {totalBill:C2}");
             Write("\t ==============================================");
-        }
-
-
-
-        private static void Main()
-        {
-            try
-            {
-                var shelfItemRepository = new ShelfItemRepository();
-                var shelfItems = shelfItemRepository.GetShelfItems().ToArray();
-
-                var specialOfferRepository = new SpecialOfferRepository();
-                var specialOffers = specialOfferRepository.GetActiveSpecialOffers().ToArray();
-
-
-                DisplayShelfItems(shelfItems, specialOffers);
-
-
-                using (var basketService = new BasketService(new SpecialOfferService(specialOfferRepository)))
-                {
-                    BasketHandler(shelfItems, basketService);
-
-                    PrintCustomerReceipt(specialOffers, basketService);
-                }
-
-                ReadLine();
-            }
-            catch (Exception ex)
-            {
-                WriteLine("\n\n");
-
-                ILogger logger = new ConsoleLogger();
-                logger.LogException(ex);
-
-                ReadLine();
-            }
         }
     }
 }
