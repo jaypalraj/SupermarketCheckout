@@ -9,6 +9,7 @@ namespace UnitTests
     public class Tests
     {
         private IShelfItemRepository _shelfItemRepository;
+        private IDiscountService _discountService;
         private ISpecialOfferService _specialOfferService;
         private IBasketService _basketService;
 
@@ -17,12 +18,14 @@ namespace UnitTests
         {
 
             var specialOfferRepository = new SpecialOfferRepository();
+            var discountRepository = new DiscountRepository();
+
+            _discountService = new DiscountService(discountRepository);
             _specialOfferService = new SpecialOfferService(specialOfferRepository);
 
             _shelfItemRepository = new ShelfItemRepository();
 
-            _basketService = new BasketService(_specialOfferService);
-
+            _basketService = new BasketService(_discountService, _specialOfferService);
         }
 
         [TearDown]
@@ -87,7 +90,7 @@ namespace UnitTests
 
             _basketService.AddItemToBasket(shelfItems[3]);
 
-            Assert.AreEqual(4.54m, _basketService.CalculateBasketTotal());
+            Assert.AreEqual(3.39m, _basketService.CalculateBasketTotal());
         }
 
 
@@ -107,7 +110,7 @@ namespace UnitTests
 
             _basketService.AddItemToBasket(shelfItems[3]);
 
-            Assert.AreEqual(4.54m, _basketService.CalculateBasketTotal());
+            Assert.AreEqual(3.39m, _basketService.CalculateBasketTotal());
         }
 
 
@@ -119,8 +122,8 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[0]); //1.30
             _basketService.AddItemToBasket(shelfItems[0]);
             _basketService.AddItemToBasket(shelfItems[0]);
-            _basketService.AddItemToBasket(shelfItems[0]); //0.50
-            _basketService.AddItemToBasket(shelfItems[0]); //0.50
+            _basketService.AddItemToBasket(shelfItems[0]); //0.50 - with discount 50% 0.25
+            _basketService.AddItemToBasket(shelfItems[0]); //0.50 - with discount 50% 0.25
 
             _basketService.AddItemToBasket(shelfItems[1]); //0.45
             _basketService.AddItemToBasket(shelfItems[1]);
@@ -128,11 +131,11 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[1]);
             _basketService.AddItemToBasket(shelfItems[1]); //0.30
 
-            _basketService.AddItemToBasket(shelfItems[2]); //1.80
+            _basketService.AddItemToBasket(shelfItems[2]); //1.80 - with discount 50% 0.90
 
-            _basketService.AddItemToBasket(shelfItems[3]); //0.99
+            _basketService.AddItemToBasket(shelfItems[3]); //0.99 - with discount 25% 0.74
 
-            Assert.AreEqual(6.29m, _basketService.CalculateBasketTotal());
+            Assert.AreEqual(4.64m, _basketService.CalculateBasketTotal());
         }
 
 
@@ -163,7 +166,7 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[2]); 
 
 
-            Assert.AreEqual(6.29m, _basketService.CalculateBasketTotal());
+            Assert.AreEqual(4.64m, _basketService.CalculateBasketTotal());
         }
 
 
@@ -180,8 +183,8 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[0]); //1.30
             _basketService.AddItemToBasket(shelfItems[0]);
             _basketService.AddItemToBasket(shelfItems[0]);
-            _basketService.AddItemToBasket(shelfItems[0]); //0.50
-            _basketService.AddItemToBasket(shelfItems[0]); //0.50
+            _basketService.AddItemToBasket(shelfItems[0]); //0.50 - 0.25
+            _basketService.AddItemToBasket(shelfItems[0]); //0.50 - 0.25
 
             _basketService.AddItemToBasket(shelfItems[1]); //0.45
             _basketService.AddItemToBasket(shelfItems[1]);
@@ -189,11 +192,11 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[1]);
             _basketService.AddItemToBasket(shelfItems[1]); //0.30
 
-            _basketService.AddItemToBasket(shelfItems[2]); //1.80
+            _basketService.AddItemToBasket(shelfItems[2]); //1.80 - 0.90
 
-            _basketService.AddItemToBasket(shelfItems[3]); //0.99
+            _basketService.AddItemToBasket(shelfItems[3]); //0.99 - 0.74
 
-            Assert.AreEqual(7.59m, _basketService.CalculateBasketTotal());
+            Assert.AreEqual(5.94m, _basketService.CalculateBasketTotal());
         }
 
 
@@ -208,8 +211,8 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[0]); //1.30
             _basketService.AddItemToBasket(shelfItems[0]);
             _basketService.AddItemToBasket(shelfItems[0]);
-            _basketService.AddItemToBasket(shelfItems[0]); //0.50
-            _basketService.AddItemToBasket(shelfItems[0]); //0.50
+            _basketService.AddItemToBasket(shelfItems[0]); //0.50 - 0.25
+            _basketService.AddItemToBasket(shelfItems[0]); //0.50 - 0.25
 
             _basketService.AddItemToBasket(shelfItems[1]); //0.45
             _basketService.AddItemToBasket(shelfItems[1]);
@@ -217,12 +220,12 @@ namespace UnitTests
             _basketService.AddItemToBasket(shelfItems[1]);
             _basketService.AddItemToBasket(shelfItems[1]); //0.30
 
-            _basketService.AddItemToBasket(shelfItems[2]); //1.80
-            _basketService.AddItemToBasket(shelfItems[2]); //1.80
+            _basketService.AddItemToBasket(shelfItems[2]); //1.80 - 0.90
+            _basketService.AddItemToBasket(shelfItems[2]); //1.80 - 0.90
 
-            _basketService.AddItemToBasket(shelfItems[3]); //0.99
+            _basketService.AddItemToBasket(shelfItems[3]); //0.99 - 0.74
 
-            Assert.AreEqual(9.39m, _basketService.CalculateBasketTotal());
+            Assert.AreEqual(6.84m, _basketService.CalculateBasketTotal());
         }
 
     }

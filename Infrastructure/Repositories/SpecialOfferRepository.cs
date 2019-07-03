@@ -19,10 +19,5 @@ namespace Infrastructure.Repositories
         {
             return _specialOffers.Where(s => s.ValidFrom < DateTime.Now && s.ValidTo > DateTime.Now);
         }
-
-        public SpecialOffer GetSpecialOfferForShelfItem(int shelfItemId)
-        {
-            return GetActiveSpecialOffers()?.SingleOrDefault(s => s.ShelfItemId == shelfItemId);
-        }
     }
 }

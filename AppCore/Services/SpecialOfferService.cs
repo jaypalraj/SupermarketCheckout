@@ -44,11 +44,11 @@ namespace AppCore.Services
 
         public void ApplySpecialOffersToBasketItemPrices(IList<BasketItem> basketItems)
         {
-            var specialOffers = _specialOfferRepository.GetActiveSpecialOffers().ToArray();
+            var specialOffers = _specialOfferRepository.GetActiveSpecialOffers()?.ToArray();
 
             foreach (var basketItem in basketItems)
             {
-                var itemSpecialOffer = specialOffers.SingleOrDefault(s => s.ShelfItemId == basketItem.ShelfItemId);
+                var itemSpecialOffer = specialOffers?.SingleOrDefault(s => s.ShelfItemId == basketItem.ShelfItemId);
 
                 if (itemSpecialOffer != null)
                 {

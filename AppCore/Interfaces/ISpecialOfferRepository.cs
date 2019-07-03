@@ -6,6 +6,5 @@ namespace AppCore.Interfaces
     public interface ISpecialOfferRepository
     {
         IEnumerable<SpecialOffer> GetActiveSpecialOffers();
-        SpecialOffer GetSpecialOfferForShelfItem(int shelfItemId);
     }
 }

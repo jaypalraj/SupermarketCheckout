@@ -8,11 +8,13 @@ namespace AppCore.Services
 {
     public class BasketService : IBasketService
     {
+        private readonly IDiscountService _discountService;
         private readonly ISpecialOfferService _specialOfferService;
         private static IList<BasketItem> _basketItems;
 
-        public BasketService(ISpecialOfferService specialOfferService)
+        public BasketService(IDiscountService discountService, ISpecialOfferService specialOfferService)
         {
+            _discountService = discountService;
             _specialOfferService = specialOfferService;
             _basketItems = new List<BasketItem>();
         }
@@ -47,6 +49,8 @@ namespace AppCore.Services
 
         public decimal CalculateBasketTotal()
         {
+            _discountService.ApplyDiscountToBasketItemPrices(_basketItems);
+
             _specialOfferService.ApplySpecialOffersToBasketItemPrices(_basketItems);
 
             return _basketItems.Sum(i => i.Price);
